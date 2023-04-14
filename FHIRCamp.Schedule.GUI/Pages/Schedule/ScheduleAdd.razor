@@ -1,0 +1,206 @@
+﻿@page "/ScheduleAdd"
+
+@inject IScheduleService _scheduleService;
+@inject NavigationManager _navigationManager;
+@inject IJSRuntime JSRuntime;
+<!-- Header -->
+<ModuleTitleCentered Title="Creación de Agenda - ACME Salud" />
+
+<div class="border shadow p-3 mb-5 bg-body-tertiary rounded">
+
+    <div class="panelBotones ">
+        <button class="btn btn-secondary btn-sm me-auto" @onclick="@(() => _navigationManager.NavigateTo("/ScheduleList"))">Volver</button>
+    </div>
+
+    <br />
+
+    <!-- Data -->
+    <div class="panelTabla">
+
+        <ModuleTitle Title="Nueva Agenda" />
+
+        <div class="row">
+
+            <EditForm Model="@scheduleModel" OnSubmit="@Save">
+                <div>
+                    <div class="form-group ">
+                        <label for="practitionerId" class="form-label etiqueta mt-2 mb-0">Profesional:</label>
+
+                        <select class="form-select form-select-sm" aria-label=".form-select-sm example" @bind="@scheduleModel.PractitionerId">
+                            <option selected>Seleccione un profesional</option>
+                            @foreach (var p in practitioners)
+                            {
+                                <option value="@p.Id">@p.Name.ToUpper()</option>
+                            }
+                        </select>
+
+                    </div>
+                    <div class="form-group ">
+                        <label for="locationId" class="form-label etiqueta mt-2 mb-0">Ubicación:</label>
+                        <select class="form-select form-select-sm" aria-label=".form-select-sm example" @bind="@scheduleModel.LocationId">
+                            <option selected>Seleccione una ubicación</option>
+                            @foreach (var l in locations)
+                            {
+                                <option value="@l.Id">@l.Name.ToUpper()</option>
+                            }
+                        </select>
+                    </div>
+                    <div class=" form-group">
+                        <label for="Name" class="form-label etiqueta mt-2 mb-0">Prestación:</label>
+                        <select class="form-select form-select-sm" aria-label=".form-select-sm example" @bind="@scheduleModel.HealthcareServiceId">
+                            <option selected>Seleccione una prestación</option>
+                            @foreach (var p in services)
+                            {
+                                <option value="@p.Id">@p.Name.ToUpper()</option>
+                            }
+                        </select>
+                    </div>
+                    <div class=" form-group">
+                        <label for="Name" class="form-label etiqueta mt-2 mb-0">Fecha Inicial:</label>
+                        <InputDate id="createdDate" class="form-control form-control-sm" @bind-Value="@scheduleModel.StartDate" />
+                        <ValidationMessage For="@(() => scheduleModel.StartDate)" />
+                    </div>
+                    <div class=" form-group">
+                        <label for="Name" class="form-label etiqueta mt-2 mb-0">Fecha Final:</label>
+                        <InputDate id="createdDate" class="form-control form-control-sm" @bind-Value="@scheduleModel.EndDate" />
+                        <ValidationMessage For="@(() => scheduleModel.EndDate)" />
+                    </div>
+                    <div class=" form-group">
+                        <label for="Name" class="form-label etiqueta mt-2 mb-0">Hora Inicio:</label>
+                        <select class="form-select form-select-sm" aria-label=".form-select-sm example" @bind="@scheduleModel.StartHour">
+                            <option selected>Seleccione una Hora</option>
+                            @for (int i = 8; i < 19; i++)
+                            {
+                                <option value="@i">@i</option>
+                            }
+                        </select>
+                    </div>
+                    <div class=" form-group">
+                        <label for="Name" class="form-label etiqueta mt-2 mb-0">Hora Fin:</label>
+                        <select class="form-select form-select-sm" aria-label=".form-select-sm example" @bind="@scheduleModel.EndHour">
+                            <option selected>Seleccione una Hora</option>
+                            @for (int i = 8; i < 19; i++)
+                            {
+                                <option value="@i">@i</option>
+                            }
+                        </select>
+                    </div>
+                    <div class=" form-group">
+                        <label for="Name" class="form-label etiqueta mt-2 mb-0">Intervalo:</label>
+                        <select class="form-select form-select-sm" aria-label=".form-select-sm example" @bind="@scheduleModel.Interval">
+                            <option selected>Seleccione un intervalo</option>
+                            @for (int i = 5; i < 60; i+=5)
+                            {
+                                <option value="@i">@i</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Name" class="form-label etiqueta mt-2 mb-0">Comentario:</label>
+                        <InputTextArea id="name" class="form-control form-control-sm" @bind-Value="@scheduleModel.Comment"></InputTextArea>
+                    </div>
+
+                </div>
+
+                <br />
+                <div>
+                    <button class="btn btn-primary btn-sm" type="submit">Guardar</button>
+                    <button class="btn btn-danger btn-sm" @onclick="@(() => _navigationManager.NavigateTo("/ScheduleList"))">Cancelar</button>
+                </div>
+
+                <br />
+            </EditForm>
+
+        </div>
+    </div>
+
+</div>
+
+@code {
+
+    private ScheduleModel scheduleModel = new ScheduleModel();
+
+    private List<LocationModel> locations;
+
+    private List<PractitionerModel> practitioners;
+
+    private List<HealthcareServiceModel> services;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await LoadData();
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            scheduleModel.StartDate = DateTime.Now;
+            scheduleModel.EndDate = DateTime.Now;
+
+            locations = new List<LocationModel>();
+            locations.Add(new LocationModel() { Id = "02069c64-a106-4457-8ae1-a6c503f7db54", Name = "ACME Salud - G3 - Sede Norte" });
+            locations.Add(new LocationModel() { Id = "10", Name = "ACME Salud - G3 - Sede Centro" });
+            locations.Add(new LocationModel() { Id = "20", Name = "ACME Salud - G3 - Sede Sur" });
+
+            practitioners = new List<PractitionerModel>();
+            practitioners.Add(new PractitionerModel() { Id = "77132ce5-2079-44bb-ad93-1730f1a08784", Name = "Dr. CARLOS ALBERTO VALDERRAMA PEREZ" });
+            practitioners.Add(new PractitionerModel() { Id = "10", Name = "Gregorio Casas" });
+            practitioners.Add(new PractitionerModel() { Id = "20", Name = "Elmer Luna" });
+            practitioners.Add(new PractitionerModel() { Id = "30", Name = "Luis Manuel Chávez" });
+            practitioners.Add(new PractitionerModel() { Id = "40", Name = "Alvaro Silva" });
+            practitioners.Add(new PractitionerModel() { Id = "50", Name = "Diego Narvaez" });
+            practitioners.Add(new PractitionerModel() { Id = "60", Name = "Alonso Fonseca" });
+
+            services = new List<HealthcareServiceModel>();
+            services.Add(new HealthcareServiceModel() { Id = "eb5d22d5-af8a-4ad9-a756-67f7f6cfcaca", Name = "Primera vez consulta medicina general" });
+            services.Add(new HealthcareServiceModel() { Id = "20", Name = "Primera vez consulta especializada" });
+            services.Add(new HealthcareServiceModel() { Id = "30", Name = "Control medicina general" });
+            services.Add(new HealthcareServiceModel() { Id = "40", Name = "Control medicina especializada" });
+            services.Add(new HealthcareServiceModel() { Id = "50", Name = "Control modalidad telemedicina" });
+
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+    }
+
+    private async Task Save()
+    {
+        try
+        {
+            var practitioner = practitioners.Where(p => p.Id == scheduleModel.PractitionerId).FirstOrDefault();
+
+            if(practitioner != null)
+                scheduleModel.PractitionerName = practitioner.Name;
+
+            var location = locations.Where(l => l.Id == scheduleModel.LocationId).FirstOrDefault();
+
+            if(location != null)
+                scheduleModel.LocationName = location.Name;
+
+            var service = services.Where(s => s.Id == scheduleModel.HealthcareServiceId).FirstOrDefault();
+
+            if (service != null)
+                scheduleModel.HealthcareServiceName = service.Name;
+
+
+            await _scheduleService.CreateSchedule(scheduleModel);
+
+            _navigationManager.NavigateTo("/ScheduleList");
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+    }
+}

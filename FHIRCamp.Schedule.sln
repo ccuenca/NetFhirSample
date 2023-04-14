@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 25.0.1705.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FHIRCamp.Schedule.GUI", "FHIRCamp.Schedule.GUI\FHIRCamp.Schedule.GUI.csproj", "{FD7319B6-D8B0-4BFE-ADBC-3FC5C10EC813}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FHIRCamp.Schedule.BL", "FHIRCamp.Schedule.BL\FHIRCamp.Schedule.BL.csproj", "{8220DED0-3459-425A-AD6D-EF8E5E47ACEE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FD7319B6-D8B0-4BFE-ADBC-3FC5C10EC813}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD7319B6-D8B0-4BFE-ADBC-3FC5C10EC813}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD7319B6-D8B0-4BFE-ADBC-3FC5C10EC813}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD7319B6-D8B0-4BFE-ADBC-3FC5C10EC813}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8220DED0-3459-425A-AD6D-EF8E5E47ACEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8220DED0-3459-425A-AD6D-EF8E5E47ACEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8220DED0-3459-425A-AD6D-EF8E5E47ACEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8220DED0-3459-425A-AD6D-EF8E5E47ACEE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8299A96C-06FD-441B-A660-65BB386CFEAC}
+	EndGlobalSection
+EndGlobal

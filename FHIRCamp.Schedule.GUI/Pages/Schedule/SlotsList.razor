@@ -1,0 +1,103 @@
+﻿@page "/schedules/slots/{scheduleId}"
+
+@inject IScheduleService _scheduleService;
+@inject NavigationManager _navigationManager;
+@inject IJSRuntime JSRuntime;
+<!-- Header -->
+<ModuleTitleCentered Title="Horarios Asignados" />
+
+<div class="border shadow p-3 mb-5 bg-body-tertiary rounded">
+
+    <div class="panelBotones ">
+        <button class="btn btn-secondary btn-sm me-auto" @onclick="@(() => _navigationManager.NavigateTo("/ScheduleList"))">Volver</button>
+    </div>
+
+    <br />
+
+    <!-- Data -->
+    <div class="panelTabla">
+
+        <ModuleTitle Title="Horarios Asignados" />
+        <div>
+            @if (slots?.Count() > 0)
+            {
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover table-bordered table-sm text-center">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Estado</th>
+                                <th>Fecha de Inicio</th>
+                                <th>Fecha de Fin</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var slot in slots)
+                            {
+                                <tr>
+                                    <td>@slot.Id</td>
+                                    <td>@slot.Status?.ToUpper()</td>
+                                    <td>@slot.Start.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@slot.End.ToString("dd/MM/yyyy HH:mm")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <p>No hay Horarios para mostrar</p>
+            }
+
+        </div>
+    </div>
+
+</div>
+
+
+@code {
+
+    [Parameter]
+    public string scheduleId { get; set; }
+
+    private IEnumerable<SlotModel>? slots;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await LoadSlots();
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+    }
+
+    private async Task LoadSlots()
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(scheduleId))
+            {
+                slots = await _scheduleService.GetSlotsBySchedule(scheduleId);
+
+                slots = slots.OrderBy(d => d.Start);
+            }
+            else
+            {
+                slots = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+    }
+
+}
+

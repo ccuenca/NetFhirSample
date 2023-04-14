@@ -1,0 +1,164 @@
+﻿@page "/ScheduleList"
+
+@inject IScheduleService _scheduleService;
+@inject NavigationManager _navigationManager;
+@inject IJSRuntime JSRuntime;
+
+<PageTitle>Gestión de Agendas - ACME Salud</PageTitle>
+
+<!-- Header -->
+<ModuleTitleCentered Title="Gestión de Agendas - ACME Salud" />
+
+<div class="border shadow p-3 mb-5 bg-body-tertiary rounded">
+
+    <div class="panelBotones ">
+        <button class="btn btn-secondary btn-sm me-auto" @onclick="@(() => _navigationManager.NavigateTo("/ScheduleAdd"))">Nuevo</button>
+    </div>
+
+    <br />
+
+    <div class="panelBotones">
+
+        <select class="form-select form-select-sm" aria-label=".form-select-sm example" @onchange="SearchSchedules">
+            <option selected>Seleccione una ubicación</option>
+            @foreach (var location in locations)
+            {
+                <option value="@location.Id">@location.Name.ToUpper()</option>
+            }
+        </select>
+
+    </div>
+
+    <br />
+
+    <!-- Data -->
+    <div class="panelTabla">
+
+        <ModuleTitle Title="Agendamientos Realizados" />
+        <div>
+            @if (schedules?.Count() > 0)
+            {
+                <div class="table-responsive">
+                   <table class="table table-hover table-bordered table-sm text-center fs-10">
+                       <thead>
+                           <tr>
+                               <th>Id</th>
+                               <th>Profesional</th>
+                               <th>Ubicación</th>
+                               <th>Prestación</th>
+                               <th>Fecha de Inicio</th>
+                               <th>Fecha de Fin</th>
+                               <th>Comentarios</th>
+                               <th>Horarios</th>
+                               <th>Eliminar</th>
+                           </tr>
+                       </thead>
+                       <tbody>
+                           @foreach (var schedule in schedules)
+                           {
+                               <tr>
+                                   <td>@schedule.Id</td>
+                                   <td>@schedule.PractitionerName?.ToUpper()</td>
+                                   <td>@schedule.LocationName?.ToUpper()</td>
+                                   <td>@schedule.HealthcareServiceName?.ToUpper()</td>
+                                   <td>@schedule.StartDate.ToString("dd/MM/yyyy")</td>
+                                   <td>@schedule.EndDate.ToString("dd/MM/yyyy")</td>
+                                   <td>@schedule.Comment</td>
+                                   <td class="align-items-center">
+                                       <a href="/schedules/slots/@schedule.Id"><span class="oi oi-clock"></span></a>
+                                   </td>
+
+                                   <td class="align-items-center">
+                                       <a onclick="@(() => DeleteSchedule(schedule))"><span class="oi oi-trash"></span></a>
+                                   </td>
+
+                               </tr>
+                           }
+                       </tbody>
+                   </table>
+                </div>
+
+                
+            }
+            else
+            {
+                <p>No hay Agendamientos para mostrar</p>
+            }
+
+        </div>
+    </div>
+
+</div>
+
+@code{
+
+    private IEnumerable<ScheduleModel>? schedules;
+    private List<LocationModel> locations;
+    private String selectedLocation;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await LoadLocations();
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+    }
+
+    private async Task DeleteSchedule(ScheduleModel schedule)
+    {
+        if (!await JSRuntime.InvokeAsync<bool>("confirm", $"Esta seguro de eliminar la Agenda Seleccionada: {schedule.Comment}?"))
+            return;
+
+        await _scheduleService.Delete(schedule.Id);
+        await LoadSchedules(selectedLocation);
+        StateHasChanged();
+        //_toastService.ShowSuccess("Tipo de documento eliminado");
+    }
+
+    private async Task LoadLocations()
+    {
+        try
+        {
+            locations = new List<LocationModel>();
+
+            locations.Add(new LocationModel() { Id = "02069c64-a106-4457-8ae1-a6c503f7db54", Name = "ACME Salud - G3 - Sede Norte" });
+            locations.Add(new LocationModel() { Id = "10", Name = "ACME Salud - G3 - Sede Centro" });
+            locations.Add(new LocationModel() { Id = "20", Name = "ACME Salud - G3 - Sede Sur" });
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+    }
+
+    private async Task SearchSchedules(ChangeEventArgs e)
+    {
+        try
+        {
+            selectedLocation = e.Value?.ToString();
+
+            await LoadSchedules(selectedLocation);
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+    }
+
+    private async Task LoadSchedules(string locationId)
+    {
+        if (!string.IsNullOrEmpty(locationId))
+        {
+            schedules = await _scheduleService.GetAll(locationId);
+        }
+        else
+        {
+            schedules = null;
+        }
+    }
+
+}
